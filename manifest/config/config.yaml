@@ -1,0 +1,30 @@
+app:
+  name: mogu-picture
+
+nacos:
+  client:
+    namespaceId: test
+    timeoutMs: 5000
+    notLoadCacheAtStart: true
+    username: nacos
+    password: nacos
+    logLevel: debug
+  server:
+    addr: 127.0.0.1
+    port: 8848
+    contextPath: /nacos
+    scheme: http
+  config:
+    #指定分组
+    group: DEFAULT_GROUP
+    fileExtension: yaml
+  discovery:
+    Weight: 10
+    enable: true
+    healthy: true
+    ephemeral: true
+    groupName: DEFAULT_GROUP
+    metadata:
+      appName: mogu-picture
+      version: 0.0.1
+
