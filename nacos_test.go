@@ -58,21 +58,30 @@ func TestClient(t *testing.T) {
 
 	content, err := configClient.GetConfig(vo.ConfigParam{
 		DataId: "mogu-picture-test.yaml",
-		Group:  "DEFAULT_GROUP"})
+		Group:  "test"})
 
 	fmt.Println(content)
 
-	success, err := namingClient.RegisterInstance(vo.RegisterInstanceParam{
+	//success, err := namingClient.RegisterInstance(vo.RegisterInstanceParam{
+	//	Ip:          "127.0.0.1",
+	//	Port:        9602,
+	//	ServiceName: "mogu-picture",
+	//	Weight:      10,
+	//	Enable:      true,
+	//	Healthy:     true,
+	//	Ephemeral:   false,
+	//	Metadata:    map[string]string{"appName": "mogu-picture"},
+	//	GroupName:   "test", // 默认值DEFAULT_GROUP
+	//})
+
+	success, err := namingClient.DeregisterInstance(vo.DeregisterInstanceParam{
 		Ip:          "127.0.0.1",
 		Port:        9602,
 		ServiceName: "mogu-picture",
-		Weight:      10,
-		Enable:      true,
-		Healthy:     true,
-		Ephemeral:   false,
-		Metadata:    map[string]string{"appName": "mogu-picture"},
-		GroupName:   "DEFAULT_GROUP", // 默认值DEFAULT_GROUP
+		Ephemeral:   true,
+		GroupName:   "test",
 	})
+
 	g.Cfg().GetAdapter().(*gcfg.AdapterFile).SetContent(content)
 	get, err := g.Cfg().Get(gctx.New(), "logger")
 	if err != nil {
