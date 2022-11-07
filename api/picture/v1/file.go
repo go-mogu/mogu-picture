@@ -1,10 +1,10 @@
 package v1
 
 import (
+	"github.com/go-mogu/mogu-picture/internal/app/picture/model"
+	"github.com/go-mogu/mogu-picture/internal/app/picture/model/entity"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
-	"mogu-picture/internal/app/picture/model"
-	"mogu-picture/internal/app/picture/model/entity"
 )
 
 // FilePageListReq 分页查询文件表Req
@@ -44,20 +44,20 @@ type FileGetRes struct {
 // FileAddReq 添加文件表Req
 type FileAddReq struct {
 	g.Meta          `path:"/" tags:"File" method:"post" summary:"添加文件表"`
-	Uid             string      `json:"uid"   dc:"唯一uid"`                                               //唯一uid
-	FileOldName     string      `json:"fileOldName" v:"required#旧文件名不能为空"  dc:"旧文件名"`         //旧文件名
-	PicName         string      `json:"picName" v:"required#文件名不能为空"  dc:"文件名"`                 //文件名
-	PicUrl          string      `json:"picUrl"   dc:"文件地址"`                                           //文件地址
+	Uid             string      `json:"uid"   dc:"唯一uid"`                                   //唯一uid
+	FileOldName     string      `json:"fileOldName" v:"required#旧文件名不能为空"  dc:"旧文件名"`       //旧文件名
+	PicName         string      `json:"picName" v:"required#文件名不能为空"  dc:"文件名"`             //文件名
+	PicUrl          string      `json:"picUrl"   dc:"文件地址"`                                 //文件地址
 	PicExpandedName string      `json:"picExpandedName" v:"required#文件扩展名不能为空"  dc:"文件扩展名"` //文件扩展名
-	FileSize        int         `json:"fileSize"   dc:"文件大小"`                                         //文件大小
-	FileSortUid     string      `json:"fileSortUid"   dc:"文件分类uid"`                                   //文件分类uid
-	AdminUid        string      `json:"adminUid"   dc:"管理员uid"`                                        //管理员uid
-	UserUid         string      `json:"userUid"   dc:"用户uid"`                                           //用户uid
-	Status          int8        `json:"status" v:"required#状态不能为空"  dc:"状态"`                      //状态
-	CreateTime      *gtime.Time `json:"createTime" v:"required#创建时间不能为空"  dc:"创建时间"`          //创建时间
-	UpdateTime      *gtime.Time `json:"updateTime" v:"required#更新时间不能为空"  dc:"更新时间"`          //更新时间
-	QiNiuUrl        string      `json:"qiNiuUrl"   dc:"七牛云地址"`                                       //七牛云地址
-	MinioUrl        string      `json:"minioUrl"   dc:"Minio文件URL"`                                     //Minio文件URL
+	FileSize        int         `json:"fileSize"   dc:"文件大小"`                               //文件大小
+	FileSortUid     string      `json:"fileSortUid"   dc:"文件分类uid"`                         //文件分类uid
+	AdminUid        string      `json:"adminUid"   dc:"管理员uid"`                             //管理员uid
+	UserUid         string      `json:"userUid"   dc:"用户uid"`                               //用户uid
+	Status          int8        `json:"status" v:"required#状态不能为空"  dc:"状态"`                //状态
+	CreateTime      *gtime.Time `json:"createTime" v:"required#创建时间不能为空"  dc:"创建时间"`        //创建时间
+	UpdateTime      *gtime.Time `json:"updateTime" v:"required#更新时间不能为空"  dc:"更新时间"`        //更新时间
+	QiNiuUrl        string      `json:"qiNiuUrl"   dc:"七牛云地址"`                              //七牛云地址
+	MinioUrl        string      `json:"minioUrl"   dc:"Minio文件URL"`                         //Minio文件URL
 }
 
 // FileAddRes 添加文件表Req
@@ -68,21 +68,21 @@ type FileAddRes struct {
 // FileEditReq 编辑文件表Req
 type FileEditReq struct {
 	g.Meta          `path:"/" tags:"File" method:"put" summary:"编辑文件表"`
-	Uid             string      `json:"uid" v:"required#唯一uid不能为空"  dc:"唯一uid"`                   //主键
-	VersionNumber   string      `json:"versionNumber" v:"required#未识别到版本号" dc:"版本号"`            //版本号
-	FileOldName     string      `json:"fileOldName" v:"required#旧文件名不能为空"  dc:"旧文件名"`         //旧文件名
-	PicName         string      `json:"picName" v:"required#文件名不能为空"  dc:"文件名"`                 //文件名
-	PicUrl          string      `json:"picUrl"   dc:"文件地址"`                                           //文件地址
+	Uid             string      `json:"uid" v:"required#唯一uid不能为空"  dc:"唯一uid"`             //主键
+	VersionNumber   string      `json:"versionNumber" v:"required#未识别到版本号" dc:"版本号"`        //版本号
+	FileOldName     string      `json:"fileOldName" v:"required#旧文件名不能为空"  dc:"旧文件名"`       //旧文件名
+	PicName         string      `json:"picName" v:"required#文件名不能为空"  dc:"文件名"`             //文件名
+	PicUrl          string      `json:"picUrl"   dc:"文件地址"`                                 //文件地址
 	PicExpandedName string      `json:"picExpandedName" v:"required#文件扩展名不能为空"  dc:"文件扩展名"` //文件扩展名
-	FileSize        int         `json:"fileSize"   dc:"文件大小"`                                         //文件大小
-	FileSortUid     string      `json:"fileSortUid"   dc:"文件分类uid"`                                   //文件分类uid
-	AdminUid        string      `json:"adminUid"   dc:"管理员uid"`                                        //管理员uid
-	UserUid         string      `json:"userUid"   dc:"用户uid"`                                           //用户uid
-	Status          int8        `json:"status" v:"required#状态不能为空"  dc:"状态"`                      //状态
-	CreateTime      *gtime.Time `json:"createTime" v:"required#创建时间不能为空"  dc:"创建时间"`          //创建时间
-	UpdateTime      *gtime.Time `json:"updateTime" v:"required#更新时间不能为空"  dc:"更新时间"`          //更新时间
-	QiNiuUrl        string      `json:"qiNiuUrl"   dc:"七牛云地址"`                                       //七牛云地址
-	MinioUrl        string      `json:"minioUrl"   dc:"Minio文件URL"`                                     //Minio文件URL
+	FileSize        int         `json:"fileSize"   dc:"文件大小"`                               //文件大小
+	FileSortUid     string      `json:"fileSortUid"   dc:"文件分类uid"`                         //文件分类uid
+	AdminUid        string      `json:"adminUid"   dc:"管理员uid"`                             //管理员uid
+	UserUid         string      `json:"userUid"   dc:"用户uid"`                               //用户uid
+	Status          int8        `json:"status" v:"required#状态不能为空"  dc:"状态"`                //状态
+	CreateTime      *gtime.Time `json:"createTime" v:"required#创建时间不能为空"  dc:"创建时间"`        //创建时间
+	UpdateTime      *gtime.Time `json:"updateTime" v:"required#更新时间不能为空"  dc:"更新时间"`        //更新时间
+	QiNiuUrl        string      `json:"qiNiuUrl"   dc:"七牛云地址"`                              //七牛云地址
+	MinioUrl        string      `json:"minioUrl"   dc:"Minio文件URL"`                         //Minio文件URL
 }
 
 // FileEditRes 编辑文件表Res
@@ -93,7 +93,7 @@ type FileEditRes struct {
 // FileEditStateReq 编辑文件表状态Req
 type FileEditStateReq struct {
 	g.Meta `path:"/state" tags:"File" method:"put" summary:"批量编辑文件表状态"`
-	Ids    []string `json:"ids" v:"required#字典主键不能为空"  dc:"id集合"`     //主键
+	Ids    []string `json:"ids" v:"required#字典主键不能为空"  dc:"id集合"`   //主键
 	State  int8     `json:"state" v:"required#字典状态不能为空"  dc:"字典状态"` //状态
 }
 

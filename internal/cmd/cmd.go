@@ -2,29 +2,40 @@ package cmd
 
 import (
 	"context"
-	"github.com/gogf/gf/v2/net/goai"
-	"mogu-picture/internal/consts"
-	"mogu-picture/internal/router"
-
+	actuator "github.com/go-mogu/mogu-picture/internal/app/actuator/controller"
+	"github.com/go-mogu/mogu-picture/internal/consts"
+	"github.com/go-mogu/mogu-picture/internal/core/config"
+	_ "github.com/go-mogu/mogu-picture/internal/core/config"
+	"github.com/go-mogu/mogu-picture/internal/router"
+	utils "github.com/go-mogu/mogu-picture/utility"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/net/goai"
 	"github.com/gogf/gf/v2/os/gcmd"
 )
 
 var (
 	Main = gcmd.Command{
-		Name:  "main",
-		Usage: "main",
+		Name:  "mogu-picture",
+		Usage: "mogu-picture",
 		Brief: "start http server",
 		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
 			s := g.Server()
+			s.SetName(g.Cfg().MustGet(ctx, "app.name").String())
 			s.Group("/", func(group *ghttp.RouterGroup) {
 				group.Middleware(ghttp.MiddlewareHandlerResponse)
+				group.Bind(actuator.Actuator)
 				router.BindController(group)
 			})
 			enhanceOpenAPIDoc(s)
-			s.Run()
-			return nil
+			err = s.Start()
+			utils.ErrIsNil(ctx, err)
+			err = config.RegisterInstance(ctx, s)
+			if err != nil {
+				return err
+			}
+			g.Wait()
+			return err
 		},
 	}
 )

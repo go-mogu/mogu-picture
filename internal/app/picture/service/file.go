@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
-	"mogu-picture/internal/app/picture/model"
-	"mogu-picture/internal/app/picture/model/entity"
+	"github.com/go-mogu/mogu-picture/internal/app/picture/model"
+	"github.com/go-mogu/mogu-picture/internal/app/picture/model/entity"
 )
 
 type IFile interface {

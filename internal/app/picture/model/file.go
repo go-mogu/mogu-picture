@@ -1,8 +1,8 @@
 package model
 
 import (
-	"mogu-picture/internal/app/picture/model/entity"
-	"mogu-picture/internal/model"
+	"github.com/go-mogu/mogu-picture/internal/app/picture/model/entity"
+	"github.com/go-mogu/mogu-picture/internal/model"
 )
 
 type File struct {

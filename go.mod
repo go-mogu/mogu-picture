@@ -1,4 +1,4 @@
-module mogu-picture
+module github.com/go-mogu/mogu-picture
 
 go 1.18
 

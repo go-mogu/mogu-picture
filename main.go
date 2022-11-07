@@ -1,11 +1,11 @@
 package main
 
 import (
+	_ "github.com/go-mogu/mogu-picture/internal/packed"
 	_ "github.com/gogf/gf/contrib/drivers/mysql/v2"
 	"github.com/gogf/gf/v2/os/gctx"
-	_ "mogu-picture/internal/packed"
 
-	"mogu-picture/internal/cmd"
+	"github.com/go-mogu/mogu-picture/internal/cmd"
 )
 
 func main() {

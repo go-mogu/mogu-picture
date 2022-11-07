@@ -2,15 +2,15 @@ package logic
 
 import (
 	"context"
+	"github.com/go-mogu/mogu-picture/internal/app/picture/dao"
+	"github.com/go-mogu/mogu-picture/internal/app/picture/model"
+	"github.com/go-mogu/mogu-picture/internal/app/picture/model/entity"
+	"github.com/go-mogu/mogu-picture/internal/app/picture/service"
+	"github.com/go-mogu/mogu-picture/internal/consts"
+	utils "github.com/go-mogu/mogu-picture/utility"
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
-	"mogu-picture/internal/app/picture/dao"
-	"mogu-picture/internal/app/picture/model"
-	"mogu-picture/internal/app/picture/model/entity"
-	"mogu-picture/internal/app/picture/service"
-	"mogu-picture/internal/consts"
-	utils "mogu-picture/utility"
 )
 
 func init() {

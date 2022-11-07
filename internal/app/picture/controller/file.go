@@ -2,10 +2,10 @@ package controller
 
 import (
 	"context"
+	"github.com/go-mogu/mogu-picture/api/picture/v1"
+	"github.com/go-mogu/mogu-picture/internal/app/picture/model"
+	"github.com/go-mogu/mogu-picture/internal/app/picture/service"
 	"github.com/gogf/gf/v2/util/gconv"
-	"mogu-picture/api/picture/v1"
-	"mogu-picture/internal/app/picture/model"
-	"mogu-picture/internal/app/picture/service"
 )
 
 var (
