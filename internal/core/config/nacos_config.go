@@ -45,18 +45,6 @@ func init() {
 	for k, v := range m {
 		data[k] = v
 	}
-
-	//success, err := namingClient.DeregisterInstance(vo.DeregisterInstanceParam{
-	//	Ip:          "127.0.0.1",
-	//	Port:        9602,
-	//	ServiceName: "mogu-picture",
-	//	Ephemeral:   true,
-	//	GroupName:   "test",
-	//})
-	//if !success {
-	//	panic("注册失败")
-	//}
-
 }
 
 func getConfigParam(ctx context.Context, config vo.ConfigParam) vo.ConfigParam {
@@ -68,7 +56,7 @@ func getConfigParam(ctx context.Context, config vo.ConfigParam) vo.ConfigParam {
 }
 
 func RegisterInstance(ctx context.Context, s *ghttp.Server) (err error) {
-	// 创建服务发现客户端的另一种方式 (推荐)
+	// 创建服务发现客户端
 	namingClient, err := clients.NewNamingClient(
 		vo.NacosClientParam{
 			ClientConfig:  &nacosConfig.Client,
@@ -82,7 +70,7 @@ func RegisterInstance(ctx context.Context, s *ghttp.Server) (err error) {
 	instanceParam := vo.RegisterInstanceParam{
 		Port:        uint64(s.GetListenedPort()),
 		ServiceName: s.GetName(),
-		Weight:      10,
+		Weight:      1,
 		Enable:      true,
 		Healthy:     true,
 		Ephemeral:   true,
@@ -133,8 +121,6 @@ func actuator(ctx context.Context, namingClient naming_client.INamingClient) {
 			err = r.Close()
 			utils.ErrIsNil(ctx, err)
 		}(r)
-	} else {
-		panic(gerror.New("register instance failed!"))
 	}
 
 }

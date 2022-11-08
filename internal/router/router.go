@@ -6,7 +6,7 @@ import (
 )
 
 func BindController(group *ghttp.RouterGroup) {
-	group.Group("/api/v1", func(group *ghttp.RouterGroup) {
+	group.Group("/file", func(group *ghttp.RouterGroup) {
 		router.InitFile(group)
 	})
 
