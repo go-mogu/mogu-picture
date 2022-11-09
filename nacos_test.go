@@ -29,11 +29,10 @@ func TestClient(t *testing.T) {
 	// 至少一个ServerConfig
 	serverConfigs := []constant.ServerConfig{
 		{
-			IpAddr:      "120.48.7.239",
+			IpAddr:      "10.168.1.125",
 			ContextPath: "/nacos",
-			Port:        30848,
+			Port:        8848,
 			Scheme:      "http",
-			GrpcPort:    32102,
 		},
 	}
 
@@ -86,10 +85,10 @@ func TestClient(t *testing.T) {
 	})
 	utils.ErrIsNil(ctx, err)
 	success, err := namingClient.DeregisterInstance(vo.DeregisterInstanceParam{
-		Ip:          "169.254.48.216",
-		Port:        52623,
+		Ip:          "127.0.0.1",
+		Port:        9602,
 		ServiceName: "mogu-picture",
-		GroupName:   "test",
+		GroupName:   "DEFAULT_GROUP",
 	})
 	if !success {
 		panic("注册失败")

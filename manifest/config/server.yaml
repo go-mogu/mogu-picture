@@ -44,7 +44,7 @@ database:
     Path: "resource/log/sql"
   default:
     debug: true
-    host: "127.0.0.1"
+    host: "10.168.1.125"
     port: "3306"
     user: "root"
     pass: "root"
@@ -57,7 +57,7 @@ database:
 redis:
   # 单实例配置
   default:
-    address: 127.0.0.1:6379
+    address: 10.168.1.125:6379
     #    pass: 111111
     db: 1
     idleTimeout: 600

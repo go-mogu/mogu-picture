@@ -15,12 +15,15 @@ import (
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/nacos-group/nacos-sdk-go/v2/clients"
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/naming_client"
+	nacosModel "github.com/nacos-group/nacos-sdk-go/v2/model"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	"time"
 )
 
 var (
 	nacosConfig model.NacosProperties
+	//服务发现客户端
+	namingClient naming_client.INamingClient
 )
 
 func init() {
@@ -57,7 +60,7 @@ func getConfigParam(ctx context.Context, config vo.ConfigParam) vo.ConfigParam {
 
 func RegisterInstance(ctx context.Context, s *ghttp.Server) (err error) {
 	// 创建服务发现客户端
-	namingClient, err := clients.NewNamingClient(
+	namingClient, err = clients.NewNamingClient(
 		vo.NacosClientParam{
 			ClientConfig:  &nacosConfig.Client,
 			ServerConfigs: nacosConfig.Server,
@@ -66,25 +69,20 @@ func RegisterInstance(ctx context.Context, s *ghttp.Server) (err error) {
 	if err != nil {
 		return err
 	}
-
-	instanceParam := vo.RegisterInstanceParam{
-		Port:        uint64(s.GetListenedPort()),
-		ServiceName: s.GetName(),
-		Weight:      1,
-		Enable:      true,
-		Healthy:     true,
-		Ephemeral:   true,
-		Metadata:    map[string]string{},
-		GroupName:   "test", // 默认值DEFAULT_GROUP
+	if nacosConfig.Discovery.Port == 0 {
+		nacosConfig.Discovery.Port = uint64(s.GetListenedPort())
 	}
-	if instanceParam.Ip == "" {
+	if nacosConfig.Discovery.ServiceName == "" {
+		nacosConfig.Discovery.ServiceName = s.GetName()
+	}
+	if nacosConfig.Discovery.Ip == "" {
 		ip, err := utils.GetLocalIP()
 		if err != nil {
 			return err
 		}
-		instanceParam.Ip = ip
+		nacosConfig.Discovery.Ip = ip
 	}
-	success, err := namingClient.RegisterInstance(instanceParam)
+	success, err := namingClient.RegisterInstance(nacosConfig.Discovery)
 	if err != nil {
 		return
 	}
@@ -98,10 +96,7 @@ func RegisterInstance(ctx context.Context, s *ghttp.Server) (err error) {
 }
 
 func actuator(ctx context.Context, namingClient naming_client.INamingClient) {
-	services, err := namingClient.GetService(vo.GetServiceParam{
-		ServiceName: g.Server().GetName(),
-		GroupName:   nacosConfig.Config.Group,
-	})
+	services, err := GetService(g.Server().GetName())
 	utils.ErrIsNil(ctx, err)
 	ip, err := utils.GetLocalIP()
 	var port = uint64(0)
@@ -123,4 +118,22 @@ func actuator(ctx context.Context, namingClient naming_client.INamingClient) {
 		}(r)
 	}
 
+}
+
+func GetService(serviceName string) (services nacosModel.Service, err error) {
+	services, err = namingClient.GetService(vo.GetServiceParam{
+		ServiceName: serviceName,
+		GroupName:   nacosConfig.Config.Group,
+	})
+	return
+}
+
+func GetInstances(serviceName string) ([]nacosModel.Instance, error) {
+	// SelectInstances 只返回满足这些条件的实例列表：healthy=${HealthyOnly},enable=true 和weight>0
+	instances, err := namingClient.SelectInstances(vo.SelectInstancesParam{
+		ServiceName: serviceName,
+		GroupName:   nacosConfig.Discovery.GroupName, // 默认值DEFAULT_GROUP
+		HealthyOnly: true,
+	})
+	return instances, err
 }

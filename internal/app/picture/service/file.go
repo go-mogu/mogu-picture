@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/go-mogu/mogu-picture/internal/app/picture/model"
 	"github.com/go-mogu/mogu-picture/internal/app/picture/model/entity"
+	baseModel "github.com/go-mogu/mogu-picture/internal/model"
+	"github.com/gogf/gf/v2/net/ghttp"
 )
 
 type IFile interface {
@@ -14,6 +16,8 @@ type IFile interface {
 	Edit(ctx context.Context, in model.File) (err error)
 	EditState(ctx context.Context, ids []string, state int8) (err error)
 	Delete(ctx context.Context, ids []string) (err error)
+	CropperPicture(ctx context.Context, list []*ghttp.UploadFile) (listMap []map[string]interface{}, err error)
+	BatchUploadFile(ctx context.Context, fileList []*ghttp.UploadFile, systemConfig baseModel.SystemConfig) (result []*entity.File, err error)
 }
 
 var localFile IFile

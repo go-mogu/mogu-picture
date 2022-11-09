@@ -1,7 +1,8 @@
 package middle
 
 import (
-	"github.com/go-mogu/mogu-picture/internal/consts"
+	"github.com/go-mogu/mogu-picture/internal/consts/RedisConf"
+	"github.com/go-mogu/mogu-picture/internal/consts/SysConf"
 	"github.com/go-mogu/mogu-picture/internal/model"
 	utils "github.com/go-mogu/mogu-picture/utility"
 	"github.com/gogf/gf/v2/frame/g"
@@ -12,22 +13,22 @@ import (
 func TokenMiddle(r *ghttp.Request) {
 	//得到请求头信息authorization信息
 	authHeader := ""
-	authorization := r.GetHeader(consts.Authorization)
+	authorization := r.GetHeader(SysConf.AUTHORIZATION)
 	if authorization != "" {
 		authHeader = authorization
-	} else if token := r.GetParam(consts.Token); token != nil {
+	} else if token := r.GetParam(SysConf.TOKEN); token != nil {
 		authHeader = token.String()
 	}
-	if authHeader != "" && gstr.HasPrefix(authHeader, consts.Bearer) {
-		onlineAdmin, err := g.Redis().Do(r.Context(), "GET", consts.LoginTokenKey+consts.SymbolColon+authHeader)
+	if authHeader != "" && gstr.HasPrefix(authHeader, SysConf.BEARER) {
+		onlineAdmin, err := g.Redis().Do(r.Context(), "GET", RedisConf.LOGIN_TOKEN_KEY+RedisConf.SEGMENTATION+authHeader)
 		utils.ErrIsNil(r.Context(), err)
 		if onlineAdmin != nil {
 			admin := new(model.OnlineAdmin)
 			err = onlineAdmin.Struct(&admin)
 			utils.ErrIsNil(r.Context(), err)
-			r.SetParam(consts.AdminUid, admin.AdminUid)
-			r.SetParam(consts.Name, admin.UserName)
-			r.SetParam(consts.Token, authHeader)
+			r.SetParam(SysConf.ADMIN_UID, admin.AdminUid)
+			r.SetParam(SysConf.NAME, admin.UserName)
+			r.SetParam(SysConf.TOKEN, authHeader)
 		}
 	}
 	r.Middleware.Next()

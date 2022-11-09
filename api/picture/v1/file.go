@@ -32,7 +32,7 @@ type FileListRes struct {
 
 // FileGetReq 查询文件表详情Req
 type FileGetReq struct {
-	g.Meta `path:"/:id" tags:"File" method:"get" summary:"列表查询文件表"`
+	g.Meta `path:"/:uid" tags:"File" method:"get" summary:"查询文件表详情"`
 	Uid    string `json:"uid" dc:"唯一uid"`
 }
 
@@ -107,3 +107,11 @@ type FileDelReq struct {
 type FileDelRes struct {
 	Msg string `json:"msg" dc:"删除提示"`
 }
+
+// CropperPictureReq 截图上传 Req
+type CropperPictureReq struct {
+	g.Meta `path:"/cropperPicture" tags:"File" method:"post" summary:"截图上传"`
+}
+
+// CropperPictureRes 截图上传 Res
+type CropperPictureRes []map[string]interface{}

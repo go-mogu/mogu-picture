@@ -5,6 +5,9 @@ import (
 	"github.com/go-mogu/mogu-picture/api/picture/v1"
 	"github.com/go-mogu/mogu-picture/internal/app/picture/model"
 	"github.com/go-mogu/mogu-picture/internal/app/picture/service"
+	"github.com/gogf/gf/v2/errors/gerror"
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/util/gconv"
 )
 
@@ -82,5 +85,19 @@ func (c *cFile) EditState(ctx context.Context, req *v1.FileEditStateReq) (res *v
 // Delete 删除文件表
 func (c *cFile) Delete(ctx context.Context, req *v1.FileDelReq) (res *v1.FileDelRes, err error) {
 	err = service.File().Delete(ctx, req.Ids)
+	return
+}
+
+// CropperPicture 截图上传
+func (c *cFile) CropperPicture(ctx context.Context, req *v1.CropperPictureReq) (res *v1.CropperPictureRes, err error) {
+	r := g.RequestFromCtx(ctx)
+	file := r.GetUploadFile("file")
+	if file == nil {
+		err = gerror.New("请选择图片")
+		return
+	}
+	multipartFileList := []*ghttp.UploadFile{file}
+	picture, err := service.File().CropperPicture(ctx, multipartFileList)
+	res = (*v1.CropperPictureRes)(&picture)
 	return
 }

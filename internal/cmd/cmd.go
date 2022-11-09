@@ -7,6 +7,7 @@ import (
 	"github.com/go-mogu/mogu-picture/internal/core/config"
 	_ "github.com/go-mogu/mogu-picture/internal/core/config"
 	"github.com/go-mogu/mogu-picture/internal/core/middle"
+	_ "github.com/go-mogu/mogu-picture/internal/logic"
 	"github.com/go-mogu/mogu-picture/internal/router"
 	utils "github.com/go-mogu/mogu-picture/utility"
 	"github.com/gogf/gf/v2/frame/g"
@@ -24,7 +25,7 @@ var (
 			s := g.Server()
 			s.SetName(g.Cfg().MustGet(ctx, "app.name").String())
 			s.Group("/", func(group *ghttp.RouterGroup) {
-				group.Middleware(ghttp.MiddlewareHandlerResponse)
+				group.Middleware(middle.MiddlewareHandlerResponse)
 				group.Bind(actuator.Actuator)
 				group.Middleware(middle.TokenMiddle)
 				router.BindController(group)

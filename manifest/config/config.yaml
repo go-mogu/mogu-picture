@@ -3,24 +3,25 @@ app:
 
 nacos:
   client:
-    namespaceId: test
+    namespaceId: dev
     timeoutMs: 5000
     notLoadCacheAtStart: true
     username: nacos
     password: nacos
     logLevel: debug
   server:
-    - ipAddr: 120.48.7.239
-      port: 30848
+    - ipAddr: 10.168.1.125
+      port: 8848
       contextPath: /nacos
       scheme: http
-      grpcPort: 32102
+#      grpcPort: 9848
   config:
     #指定分组
     group: test
     type: yaml
   discovery:
-    Weight: 10
+    ip: 10.168.1.125
+    Weight: 1
     enable: true
     healthy: true
     ephemeral: true
@@ -28,4 +29,5 @@ nacos:
     metadata:
       appName: mogu-picture
       version: 0.0.1
+      env: go1.19.3
 
