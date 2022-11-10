@@ -6,6 +6,6 @@ import (
 )
 
 type Storage struct {
-	model.PageReq
+	model.PageInfo
 	entity.Storage
 }

@@ -8,7 +8,8 @@ import (
 
 type ILocalFileService interface {
 	BatchUploadFile(ctx context.Context, multipartFileList []*ghttp.UploadFile, fileSort entity.FileSort) (list []string, err error)
-	UploadFile(ctx context.Context, multipartFile *ghttp.UploadFile, fileSort entity.FileSort) (result string, err error)
+	UploadFile(ctx context.Context, newFileName string, multipartFile *ghttp.UploadFile, fileSort entity.FileSort) (result string, err error)
+	UploadPictureByUrl(ctx context.Context, itemUrl string, newFileName string, fileSort entity.FileSort) (result string, err error)
 }
 
 var localFileService ILocalFileService

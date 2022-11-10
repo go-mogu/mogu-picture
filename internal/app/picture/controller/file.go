@@ -3,8 +3,10 @@ package controller
 import (
 	"context"
 	"github.com/go-mogu/mogu-picture/api/picture/v1"
+	"github.com/go-mogu/mogu-picture/internal/app/picture/feign"
 	"github.com/go-mogu/mogu-picture/internal/app/picture/model"
 	"github.com/go-mogu/mogu-picture/internal/app/picture/service"
+	utils "github.com/go-mogu/mogu-picture/utility"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
@@ -38,18 +40,6 @@ func (c *cFile) List(ctx context.Context, req *v1.FileListReq) (res *v1.FileList
 	}
 	res = &v1.FileListRes{
 		Rows: list,
-	}
-	return
-}
-
-// Get 查询文件表详情
-func (c *cFile) Get(ctx context.Context, req *v1.FileGetReq) (res *v1.FileGetRes, err error) {
-	entity, err := service.File().Get(ctx, req.Uid)
-	if err != nil {
-		return nil, err
-	}
-	res = &v1.FileGetRes{
-		File: entity,
 	}
 	return
 }
@@ -99,5 +89,45 @@ func (c *cFile) CropperPicture(ctx context.Context, req *v1.CropperPictureReq) (
 	multipartFileList := []*ghttp.UploadFile{file}
 	picture, err := service.File().CropperPicture(ctx, multipartFileList)
 	res = (*v1.CropperPictureRes)(&picture)
+	return
+}
+
+// GetPicture 获取文件的信息接口
+// fileIds 获取文件信息的ids
+// code ids用什么分割的，默认“,”
+func (c *cFile) GetPicture(ctx context.Context, req *v1.GetPictureReq) (res *v1.GetPictureRes, err error) {
+	result, err := service.File().GetPicture(ctx, req.FileIds, req.Code)
+	if err != nil {
+		return nil, err
+	}
+	res = (*v1.GetPictureRes)(&result)
+	return
+}
+
+// UploadPics 多文件上传
+// 上传图片接口   传入 userId sysUserId ,有那个传哪个，记录是谁传的,
+// projectName 传入的项目名称如 base 默认是base
+// sortName 传入的模块名， 如 admin，user ,等，不在数据库中记录的是不会上传的
+func (c *cFile) UploadPics(ctx context.Context, req *v1.UploadPicsReq) (res *v1.UploadPicsRes, err error) {
+	systemConfig, err := feign.GetSystemConfig(ctx)
+	utils.ErrIsNil(ctx, err)
+	r := g.RequestFromCtx(ctx)
+	uploadFiles := r.GetUploadFiles("filedatas")
+	result, err := service.File().BatchUploadFile(ctx, uploadFiles, systemConfig)
+	if err != nil {
+		return nil, err
+	}
+	res = (*v1.UploadPicsRes)(&result)
+	return
+}
+
+// UploadPicsByUrl 通过URL上传图片
+// 通过URL将图片上传到自己服务器中【主要用于Github和Gitee的头像上传】
+func (c *cFile) UploadPicsByUrl(ctx context.Context, req *v1.UploadPicsByUrlReq) (res *v1.UploadPicsByUrlRes, err error) {
+	result, err := service.File().UploadPicsByUrl(ctx, req.FileVO)
+	if err != nil {
+		return nil, err
+	}
+	res = (*v1.UploadPicsByUrlRes)(&result)
 	return
 }

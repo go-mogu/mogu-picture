@@ -6,6 +6,6 @@ import (
 )
 
 type FileSort struct {
-	model.PageReq
+	model.PageInfo
 	entity.FileSort
 }

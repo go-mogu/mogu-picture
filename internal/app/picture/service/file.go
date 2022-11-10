@@ -11,13 +11,14 @@ import (
 type IFile interface {
 	PageList(ctx context.Context, param model.File) (total int, result []*entity.File, err error)
 	List(ctx context.Context, param entity.File) (result []*entity.File, err error)
-	Get(ctx context.Context, uid string) (result *entity.File, err error)
+	GetPicture(ctx context.Context, fileIds string, code string) (result []map[string]interface{}, err error)
 	Add(ctx context.Context, in model.File) (err error)
 	Edit(ctx context.Context, in model.File) (err error)
 	EditState(ctx context.Context, ids []string, state int8) (err error)
 	Delete(ctx context.Context, ids []string) (err error)
-	CropperPicture(ctx context.Context, list []*ghttp.UploadFile) (listMap []map[string]interface{}, err error)
+	CropperPicture(ctx context.Context, list []*ghttp.UploadFile) (result []map[string]interface{}, err error)
 	BatchUploadFile(ctx context.Context, fileList []*ghttp.UploadFile, systemConfig baseModel.SystemConfig) (result []*entity.File, err error)
+	UploadPicsByUrl(ctx context.Context, fileVO model.FileVO) (result []*entity.File, err error)
 }
 
 var localFile IFile

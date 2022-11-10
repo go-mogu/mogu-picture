@@ -14,6 +14,7 @@ import (
 	"github.com/go-mogu/mogu-picture/internal/consts/EFilePriority"
 	"github.com/go-mogu/mogu-picture/internal/consts/EOpenStatus"
 	"github.com/go-mogu/mogu-picture/internal/consts/EStatus"
+	"github.com/go-mogu/mogu-picture/internal/consts/MessageConf"
 	"github.com/go-mogu/mogu-picture/internal/consts/SysConf"
 	baseModel "github.com/go-mogu/mogu-picture/internal/model"
 	utils "github.com/go-mogu/mogu-picture/utility"
@@ -22,6 +23,7 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gtime"
+	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/gogf/gf/v2/util/guid"
 )
@@ -55,7 +57,7 @@ func (s *sFile) PageList(ctx context.Context, param model.File) (total int, resu
 	if total == 0 {
 		return
 	}
-	err = daoModel.Page(param.PageNum, param.PageSize).Scan(&result)
+	err = daoModel.Page(param.CurrentPage, param.PageSize).Scan(&result)
 	if err != nil {
 		g.Log().Error(ctx, err)
 		err = gerror.New("获取数据失败")
@@ -80,14 +82,41 @@ func (s *sFile) List(ctx context.Context, param entity.File) (result []*entity.F
 	return
 }
 
-// Get 查询文件表详情
-func (s *sFile) Get(ctx context.Context, uid string) (result *entity.File, err error) {
-	result = new(entity.File)
+// GetPicture 查询文件表详情
+func (s *sFile) GetPicture(ctx context.Context, fileIds string, code string) (result []map[string]interface{}, err error) {
+	if code == "" {
+		code = Constants.SYMBOL_COMMA
+	}
+	if fileIds == "" {
+		g.Log().Error(ctx, MessageConf.PICTURE_UID_IS_NULL)
+		return nil, gerror.New(MessageConf.PICTURE_UID_IS_NULL)
+	}
+	result = make([]map[string]interface{}, 0)
+	changeStringToString := gstr.Split(fileIds, code)
+	fileList := make([]*entity.File, 0)
 	daoModel := dao.File.Ctx(ctx)
-	err = daoModel.Where(dao.File.Columns().Uid, uid).Scan(&result)
+	err = daoModel.Where(dao.File.Columns().Uid, changeStringToString).Scan(&fileList)
 	if err != nil {
 		g.Log().Error(ctx, err)
 		err = gerror.New("获取数据失败")
+	}
+	if len(fileList) > 0 {
+		for _, file := range fileList {
+			remap := make(map[string]interface{})
+			// 获取七牛云地址
+			remap[SysConf.QI_NIU_BUCKET] = file.QiNiuUrl
+			// 获取Minio对象存储地址
+			remap[SysConf.MINIO_URL] = file.MinioUrl
+			// 获取本地地址
+			remap[SysConf.URL] = file.PicUrl
+			// 后缀名，也就是类型
+			remap[SysConf.EXPANDED_NAME] = file.PicExpandedName
+			//名称
+			remap[SysConf.NAME] = file.PicName
+			remap[SysConf.UID] = file.Uid
+			remap[SysConf.FILE_OLD_NAME] = file.FileOldName
+			result = append(result, remap)
+		}
 	}
 	return
 }
@@ -181,12 +210,13 @@ func (s *sFile) BatchUploadFile(ctx context.Context, fileList []*ghttp.UploadFil
 	adminUid = request.Get(SysConf.ADMIN_UID).String()
 	projectName = request.Get(SysConf.PROJECT_NAME).String()
 	sortName = request.Get(SysConf.SORT_NAME).String()
+
 	//projectName现在默认base
 	if projectName == "" {
 		projectName = "base"
 	}
 
-	//TODO 检测用户上传，如果不是网站的用户就不能调用
+	//检测用户上传，如果不是网站的用户就不能调用
 	if userUid == "" && adminUid == "" {
 		return result, gerror.New("请先注册")
 	}
@@ -234,7 +264,7 @@ func (s *sFile) BatchUploadFile(ctx context.Context, fileList []*ghttp.UploadFil
 			}
 			//TODO 先实现本地上传
 			if EOpenStatus.OPEN == uploadLocal {
-				localUrl, err = service.LocalFileService().UploadFile(ctx, multipartFile, *fileSort)
+				localUrl, err = service.LocalFileService().UploadFile(ctx, newFileName, multipartFile, *fileSort)
 				utils.ErrIsNil(ctx, err)
 			}
 			file := entity.File{
@@ -261,4 +291,97 @@ func (s *sFile) BatchUploadFile(ctx context.Context, fileList []*ghttp.UploadFil
 		return
 	}
 	return result, gerror.New("请上传图片")
+}
+
+func (s *sFile) UploadPicsByUrl(ctx context.Context, fileVO model.FileVO) (result []*entity.File, err error) {
+	// 获取配置文件
+	var systemConfig baseModel.SystemConfig
+	if fileVO.SystemConfig != nil {
+		resultMap := fileVO.SystemConfig
+		systemConfig, err = feign.GetSystemConfigByMap(resultMap)
+	} else {
+		// 从Redis中获取七牛云配置文件
+		systemConfig, err = feign.GetSystemConfig(ctx)
+	}
+
+	userUid := fileVO.UserUid
+	adminUid := fileVO.AdminUid
+	projectName := fileVO.ProjectName
+	sortName := fileVO.SortName
+	urlList := fileVO.UrlList
+
+	//projectName现在默认base
+	if projectName == "" {
+		projectName = "base"
+	}
+	//检测用户上传，如果不是网站的用户就不能调用
+	if userUid == "" && adminUid == "" {
+		return result, gerror.New("请先注册")
+	}
+	sortColumns := dao.FileSort.Columns()
+	var fileSorts = make([]*entity.FileSort, 0)
+	err = dao.FileSort.Ctx(ctx).
+		Where(g.Map{
+			sortColumns.SortName:    sortName,
+			sortColumns.ProjectName: projectName,
+			sortColumns.Status:      EStatus.ENABLE,
+		}).Scan(&fileSorts)
+	utils.ErrIsNil(ctx, err)
+	fileSort := new(entity.FileSort)
+	if len(fileSorts) >= 1 {
+		fileSort = fileSorts[0]
+	} else {
+		return result, gerror.New("文件不被允许上传")
+	}
+	//文件上传
+	if len(urlList) > 0 {
+		result = []*entity.File{}
+		for _, itemUrl := range urlList {
+			//获取新文件名(默认为jpg)
+			newFileName := fmt.Sprintf("%d.%s", gtime.Now().UnixMilli(), "jpg")
+			// 将图片上传到本地服务器中以及七牛云中
+			picurl := ""
+			qiNiuUrl := ""
+			minioUrl := ""
+			// 上传七牛云，判断是否能够上传七牛云
+			if EOpenStatus.OPEN == systemConfig.UploadQiNiu {
+				fmt.Println(systemConfig.UploadQiNiu)
+				fmt.Println(qiNiuUrl)
+			}
+
+			// 判断是否能够上传Minio文件服务器
+			if EOpenStatus.OPEN == systemConfig.UploadMinio {
+				fmt.Println(systemConfig.UploadMinio)
+				fmt.Println(minioUrl)
+			}
+			//TODO 先实现本地上传
+			if EOpenStatus.OPEN == systemConfig.UploadLocal {
+				picurl, err = service.LocalFileService().UploadPictureByUrl(ctx, itemUrl, newFileName, *fileSort)
+				utils.ErrIsNil(ctx, err)
+			}
+			file := entity.File{
+				FileOldName:     itemUrl,
+				PicName:         newFileName,
+				PicUrl:          picurl,
+				PicExpandedName: "jpg",
+				FileSize:        0,
+				FileSortUid:     fileSort.Uid,
+				AdminUid:        adminUid,
+				UserUid:         userUid,
+				Status:          EStatus.ENABLE,
+				CreateTime:      gtime.Now(),
+				UpdateTime:      gtime.Now(),
+				QiNiuUrl:        qiNiuUrl,
+				MinioUrl:        minioUrl,
+				Uid:             guid.S(),
+			}
+			_, err = dao.File.Ctx(ctx).Save(file)
+			utils.ErrIsNil(ctx, err)
+			result = append(result, &file)
+		}
+		//保存成功返回数据
+		return
+	}
+
+	return
 }

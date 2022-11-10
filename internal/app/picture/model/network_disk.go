@@ -6,6 +6,6 @@ import (
 )
 
 type NetworkDisk struct {
-	model.PageReq
+	model.PageInfo
 	entity.NetworkDisk
 }

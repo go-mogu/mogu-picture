@@ -181,3 +181,26 @@ func getSystemConfigMap(ctx context.Context, token, platform string) (resultMap 
 	}
 	return
 }
+
+func GetSystemConfigByMap(systemConfigMap map[string]string) (systemConfig model.SystemConfig, err error) {
+	if systemConfigMap == nil {
+		return systemConfig, gerror.NewCode(gcode.New(ErrorCode.SYSTEM_CONFIG_NOT_EXIST, "", nil), MessageConf.SYSTEM_CONFIG_NOT_EXIST)
+	}
+	err = gconv.Struct(systemConfigMap, &systemConfig)
+	if err != nil {
+		return systemConfig, err
+	}
+	// 判断七牛云参数是否存在异常
+	if EOpenStatus.OPEN == systemConfig.UploadQiNiu && (systemConfig.QiNiuPictureBaseUrl == "" || systemConfig.QiNiuAccessKey == "" || systemConfig.QiNiuSecretKey == "" || systemConfig.QiNiuBucket == "" || systemConfig.QiNiuArea == "") {
+		return systemConfig, gerror.NewCode(gcode.New(ErrorCode.PLEASE_SET_QI_NIU, "", nil), MessageConf.PLEASE_SET_QI_NIU)
+	}
+	// 判断本地服务参数是否存在异常
+	if EOpenStatus.OPEN == systemConfig.UploadLocal && systemConfig.LocalPictureBaseUrl == "" {
+		return systemConfig, gerror.NewCode(gcode.New(ErrorCode.PLEASE_SET_LOCAL, "", nil), MessageConf.PLEASE_SET_LOCAL)
+	}
+	// 判断Minio服务是否存在异常
+	if EOpenStatus.OPEN == systemConfig.UploadMinio && (systemConfig.MinioEndPoint == "" || systemConfig.MinioPictureBaseUrl == "" || systemConfig.MinioAccessKey == "" || systemConfig.MinioSecretKey == "" || systemConfig.MinioBucket == "") {
+		return systemConfig, gerror.NewCode(gcode.New(ErrorCode.PLEASE_SET_MINIO, "", nil), MessageConf.PLEASE_SET_MINIO)
+	}
+	return
+}

@@ -44,7 +44,7 @@ func (s *sNetworkDisk) PageList(ctx context.Context, param model.NetworkDisk) (t
 	if total == 0 {
 		return
 	}
-	err = daoModel.Page(param.PageNum, param.PageSize).Scan(&result)
+	err = daoModel.Page(param.CurrentPage, param.PageSize).Scan(&result)
 	if err != nil {
 		g.Log().Error(ctx, err)
 		err = gerror.New("获取数据失败")

@@ -30,17 +30,6 @@ type FileListRes struct {
 	Rows []*entity.File `json:"rows" dc:"文件表数组"`
 }
 
-// FileGetReq 查询文件表详情Req
-type FileGetReq struct {
-	g.Meta `path:"/:uid" tags:"File" method:"get" summary:"查询文件表详情"`
-	Uid    string `json:"uid" dc:"唯一uid"`
-}
-
-// FileGetRes 查询文件表详情Res
-type FileGetRes struct {
-	*entity.File
-}
-
 // FileAddReq 添加文件表Req
 type FileAddReq struct {
 	g.Meta          `path:"/" tags:"File" method:"post" summary:"添加文件表"`
@@ -115,3 +104,30 @@ type CropperPictureReq struct {
 
 // CropperPictureRes 截图上传 Res
 type CropperPictureRes []map[string]interface{}
+
+// GetPictureReq 查询文件表详情Req
+type GetPictureReq struct {
+	g.Meta  `path:"/getPicture" tags:"File" method:"get" summary:"通过fileIds获取图片信息接口"`
+	FileIds string `json:"fileIds" dc:"文件ids"`
+	Code    string `json:"code" dc:"切割符"`
+}
+
+// GetPictureRes 查询文件表详情Res
+type GetPictureRes []map[string]interface{}
+
+// UploadPicsReq 多文件上传 Req
+type UploadPicsReq struct {
+	g.Meta `path:"/pictures" tags:"File" method:"post" summary:"多文件上传"`
+}
+
+// UploadPicsRes 多文件上传 Res
+type UploadPicsRes []*entity.File
+
+// UploadPicsByUrlReq 通过URL上传图片 Req
+type UploadPicsByUrlReq struct {
+	g.Meta `path:"/uploadPicsByUrl" tags:"File" method:"post" summary:"通过URL上传图片"`
+	model.FileVO
+}
+
+// UploadPicsByUrlRes 通过URL上传图片 Res
+type UploadPicsByUrlRes []*entity.File

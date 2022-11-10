@@ -2,14 +2,13 @@ package localFileService
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-mogu/mogu-picture/internal/app/picture/model/entity"
 	"github.com/go-mogu/mogu-picture/internal/app/picture/service"
 	"github.com/go-mogu/mogu-picture/internal/app/picture/util"
-	"github.com/go-mogu/mogu-picture/internal/consts/Constants"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gctx"
+	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/util/gconv"
 )
@@ -19,8 +18,6 @@ type sLocalFileService struct{}
 var (
 	path = g.Cfg().MustGet(gctx.New(), "file.upload.path").String()
 )
-
-var insLocalFileService = sLocalFileService{}
 
 // New returns the interface of Table service.
 func New() *sLocalFileService {
@@ -36,8 +33,8 @@ func (s *sLocalFileService) BatchUploadFile(ctx context.Context, multipartFileLi
 	panic("implement me")
 }
 
-func (s *sLocalFileService) UploadFile(ctx context.Context, multipartFile *ghttp.UploadFile, fileSort entity.FileSort) (result string, err error) {
-	return uploadSingleFile(ctx, multipartFile, fileSort)
+func (s *sLocalFileService) UploadFile(ctx context.Context, newFileName string, multipartFile *ghttp.UploadFile, fileSort entity.FileSort) (result string, err error) {
+	return uploadSingleFile(ctx, newFileName, multipartFile, fileSort)
 }
 
 /**
@@ -45,7 +42,7 @@ func (s *sLocalFileService) UploadFile(ctx context.Context, multipartFile *ghttp
  *
  * @return
  */
-func uploadSingleFile(ctx context.Context, multipartFile *ghttp.UploadFile, fileSort entity.FileSort) (result string, err error) {
+func uploadSingleFile(ctx context.Context, newFileName string, multipartFile *ghttp.UploadFile, fileSort entity.FileSort) (result string, err error) {
 	//判断url是否为空，如果为空，使用默认
 	sortUrl := fileSort.Url
 	if sortUrl == "" {
@@ -56,7 +53,6 @@ func uploadSingleFile(ctx context.Context, multipartFile *ghttp.UploadFile, file
 	picExpandedName := util.GetPicExpandedName(oldName)
 	//获取新文件名
 	now := gtime.Now()
-	newFileName := fmt.Sprintf("%d%s%s", now.UnixMilli(), Constants.SYMBOL_POINT, picExpandedName)
 	newPath := path + sortUrl + "/" + picExpandedName + "/" + gconv.String(now.Year()) + "/" + gconv.String(now.Month()) + "/" + gconv.String(now.Day()) + "/"
 
 	picUrl := sortUrl + "/" + picExpandedName + "/" + gconv.String(now.Year()) + "/" + gconv.String(now.Month()) + "/" + gconv.String(now.Day()) + "/" + newFileName
@@ -68,4 +64,23 @@ func uploadSingleFile(ctx context.Context, multipartFile *ghttp.UploadFile, file
 	}
 	return picUrl, nil
 
+}
+
+func (s *sLocalFileService) UploadPictureByUrl(ctx context.Context, itemUrl string, newFileName string, fileSort entity.FileSort) (fileUrl string, err error) {
+	//判断url是否为空，如果为空，使用默认
+	sortUrl := fileSort.Url
+	if sortUrl == "" {
+		sortUrl = "base/common/"
+	}
+	//获取新文件名
+	now := gtime.Now()
+	newPath := path + sortUrl + "/jpg/" + gconv.String(now.Year()) + "/" + gconv.String(now.Month()) + "/" + gconv.String(now.Day()) + "/"
+	fileUrl = sortUrl + "/jpg/" + gconv.String(now.Year()) + "/" + gconv.String(now.Month()) + "/" + gconv.String(now.Day()) + "/" + newFileName
+	saveUrl := newPath + newFileName
+	if !gfile.Exists(newPath) {
+		_ = gfile.Mkdir(newPath)
+	}
+	bytes := g.Client().GetBytes(ctx, itemUrl)
+	err = gfile.PutBytes(saveUrl, bytes)
+	return
 }
