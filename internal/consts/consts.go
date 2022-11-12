@@ -17,3 +17,10 @@ const (
 	LoginLimit  = "LoginLimit"
 	SymbolColon = ":"
 )
+
+// 存储方式
+const (
+	QiNiuKey = "qiNiu"
+	LocalKey = "local"
+	MinioKey = "minio"
+)

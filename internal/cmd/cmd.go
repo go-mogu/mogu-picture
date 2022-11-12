@@ -27,7 +27,6 @@ var (
 			s.Group("/", func(group *ghttp.RouterGroup) {
 				group.Middleware(middle.MiddlewareHandlerResponse)
 				group.Bind(actuator.Actuator)
-				group.Middleware(middle.TokenMiddle)
 				router.BindController(group)
 			})
 			enhanceOpenAPIDoc(s)

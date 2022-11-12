@@ -1,0 +1,5 @@
+var oldFilePath = in.OldFilePath
+var newFilePath = in.NewFilePath
+var fileName = in.FileName
+var fileOldName = in.FileOldName
+var extendName = in.ExtendName

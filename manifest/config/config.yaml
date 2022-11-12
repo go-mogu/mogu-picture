@@ -28,6 +28,5 @@ nacos:
     groupName: DEFAULT_GROUP
     metadata:
       appName: mogu-picture
-      version: 0.0.1
-      env: go1.19.3
+      Gary-Version: 1.0.0
 
