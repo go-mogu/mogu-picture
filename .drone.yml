@@ -33,7 +33,7 @@ steps:
       password:
         from_secret: docker_password
   - name: install
-    image: registry.aliyuncs.com/k8s-lzh/drone-cli:1.0.8
+    image: registry.aliyuncs.com/k8s-lzh/drone-cli:1.0.9
     settings:
       registry: registry.aliyuncs.com
       namespace: go-mogu
