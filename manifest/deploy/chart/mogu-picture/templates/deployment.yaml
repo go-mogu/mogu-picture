@@ -24,17 +24,6 @@ spec:
 {{- end }}
 {{ include "service.labels.standard" . | indent 8 }}
     spec:
-      initContainers:
-        - name: server-volume
-          image: {{ include "service.image" . }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command:
-            - /bin/sh
-            - -ecx
-            - cp -rfp /app/template/* /app/resource/template
-          volumeMounts:
-            - mountPath: /app/resource/template
-              name: template
       containers:
         - name: {{ .Release.Name }}
           image: {{ include "service.image" . }}
