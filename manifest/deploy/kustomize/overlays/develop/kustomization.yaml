@@ -3,7 +3,15 @@ kind: Kustomization
 
 resources:
 - ../../base
-- configmap.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+# 生成configmap
+configMapGenerator:
+  - name: mogu-picture-config
+    files:
+      - config.yaml
 
 patchesStrategicMerge:
 - deployment.yaml

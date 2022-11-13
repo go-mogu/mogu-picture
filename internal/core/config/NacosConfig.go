@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
+	"github.com/go-mogu/mogu-picture/internal/consts"
 	"github.com/go-mogu/mogu-picture/internal/model"
 	utils "github.com/go-mogu/mogu-picture/utility"
 	"github.com/gogf/gf/v2/encoding/gjson"
@@ -18,11 +19,6 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 )
 
-const (
-	appNameKey = "app.name"
-	nacosKey   = "nacos"
-)
-
 var (
 	nacosConfig model.NacosProperties
 	//服务发现客户端
@@ -33,7 +29,7 @@ var (
 
 func init() {
 	ctx := gctx.New()
-	err := g.Cfg().MustGet(ctx, nacosKey).Scan(&nacosConfig)
+	err := g.Cfg().MustGet(ctx, consts.NacosKey).Scan(&nacosConfig)
 	utils.ErrIsNil(ctx, err)
 	// 创建动态配置客户端
 	configClient, err = clients.NewConfigClient(
@@ -55,7 +51,7 @@ func init() {
 }
 
 func getConfigParam(ctx context.Context, config vo.ConfigParam) vo.ConfigParam {
-	appName := g.Cfg().MustGet(ctx, appNameKey).String()
+	appName := g.Cfg().MustGet(ctx, consts.AppNameKey).String()
 
 	config.DataId = fmt.Sprintf("%s-%s.%s", appName, config.Group, gstr.ToLower(config.Type))
 	config.Type = gstr.ToUpper(config.Type)

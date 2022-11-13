@@ -1,16 +1,18 @@
-FROM loads/alpine:3.8
+FROM alpine:3.16
 
 ###############################################################################
 #                                INSTALLATION
 ###############################################################################
+ENV APP_NAME                                mogu-picture
+ENV WORKDIR                                 /app
+ADD resource                                $WORKDIR/
+ADD ./$APP_NAME   $WORKDIR/$APP_NAME
 
-ENV WORKDIR                 /app
-ADD resource                $WORKDIR/
-ADD ./temp/linux_amd64/main $WORKDIR/main
-RUN chmod +x $WORKDIR/main
+
+RUN chmod +x $WORKDIR/$APP_NAME
 
 ###############################################################################
 #                                   START
 ###############################################################################
 WORKDIR $WORKDIR
-CMD ./main
+CMD ./$APP_NAME

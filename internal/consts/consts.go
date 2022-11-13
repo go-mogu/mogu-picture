@@ -14,6 +14,10 @@ const (
 )
 
 const (
+	AppNameKey = "app.name"
+	NacosKey   = "nacos"
+)
+const (
 	LoginLimit  = "LoginLimit"
 	SymbolColon = ":"
 )

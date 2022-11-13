@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	actuator "github.com/go-mogu/mogu-picture/internal/app/actuator/controller"
 	"github.com/go-mogu/mogu-picture/internal/consts"
 	"github.com/go-mogu/mogu-picture/internal/core/config"
 	_ "github.com/go-mogu/mogu-picture/internal/core/config"
@@ -13,22 +14,21 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/net/goai"
 	"github.com/gogf/gf/v2/os/gcmd"
+	"github.com/gogf/gf/v2/os/gctx"
 )
 
 var (
-	Main = gcmd.Command{
-		Name:  "mogu-picture",
-		Usage: "mogu-picture",
+	appName = g.Cfg().MustGet(gctx.New(), consts.AppNameKey).String()
+	Main    = gcmd.Command{
+		Name:  appName,
+		Usage: appName,
 		Brief: "start http server",
 		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
 			s := g.Server()
-			s.SetName(g.Cfg().MustGet(ctx, "app.name").String())
+			s.SetName(appName)
 			s.Group("/", func(group *ghttp.RouterGroup) {
-				group.GET("/swagger-ui/index.html", func(r *ghttp.Request) {
-					r.Response.Write(swaggerUIPageContent)
-				})
 				group.Middleware(middle.MiddlewareHandlerResponse)
-				//group.Bind(actuator.Actuator)
+				group.Bind(actuator.Actuator)
 				router.BindController(group)
 			})
 			enhanceOpenAPIDoc(s)
@@ -46,10 +46,8 @@ var (
 
 func enhanceOpenAPIDoc(s *ghttp.Server) {
 	openapi := s.GetOpenApi()
-	openapi.Config.CommonResponse = ghttp.DefaultHandlerResponse{}
-	openapi.Config.CommonResponseDataField = `Data`
 	servers := make(goai.Servers, 0)
-	servers = append(servers, goai.Server{URL: "/mogu-picture"})
+	servers = append(servers, goai.Server{URL: "/" + appName})
 	openapi.Servers = &servers
 	// API description.
 	openapi.Info = goai.Info{
@@ -61,30 +59,3 @@ func enhanceOpenAPIDoc(s *ghttp.Server) {
 		},
 	}
 }
-
-const (
-	swaggerUIPageContent = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="SwaggerUI"/>
-  <title>SwaggerUI</title>
-  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@latest/swagger-ui.css" />
-</head>
-<body>
-<div id="swagger-ui"></div>
-<script src="https://unpkg.com/swagger-ui-dist@latest/swagger-ui-bundle.js" crossorigin></script>
-<script>
-	window.onload = () => {
-		window.ui = SwaggerUIBundle({
-			url:    '/v3/api-docs',
-			dom_id: '#swagger-ui',
-		});
-	};
-</script>
-</body>
-</html>
-`
-)
