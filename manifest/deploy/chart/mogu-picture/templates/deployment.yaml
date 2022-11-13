@@ -24,6 +24,17 @@ spec:
 {{- end }}
 {{ include "service.labels.standard" . | indent 8 }}
     spec:
+      initContainers:
+        - name: server-volume
+          image: {{ include "service.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /bin/sh
+            - -ecx
+            - cp -rfp /app/template/* /app/resource/template
+          volumeMounts:
+            - mountPath: /app/resource/template
+              name: template
       containers:
         - name: {{ .Release.Name }}
           image: {{ include "service.image" . }}
@@ -31,8 +42,8 @@ spec:
           env:
 {{- range $name, $value := .Values.env.open }}
 {{- if not (empty $value) }}
-          - name: {{ $name | quote }}
-            value: {{ $value | quote }}
+            - name: {{ $name | quote }}
+              value: {{ $value | quote }}
 {{- end }}
 {{- end }}
           ports:
@@ -40,6 +51,11 @@ spec:
               containerPort: {{ .Values.service.ports.http.port }}
               protocol: TCP
           volumeMounts:
+            - mountPath: /app/resource/data
+              name: data
+{{- if not (empty .Values.persistence.subPath) }}
+              subPath: {{ .Values.persistence.subPath }}
+{{- end }}
             - mountPath: /app/config.yaml
               name: config
               subPath: config.yaml
@@ -97,6 +113,13 @@ spec:
       tolerations: {{ toYaml . | nindent 8 }}
 {{- end }}
       volumes:
+        - name: data
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "pvc.name" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
         - name: config
           configMap:
             name: {{ .Release.Name }}-config
