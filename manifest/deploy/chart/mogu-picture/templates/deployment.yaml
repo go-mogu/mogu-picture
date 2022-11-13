@@ -43,9 +43,6 @@ spec:
             - mountPath: /app/config.yaml
               name: config
               subPath: config.yaml
-{{- if not (empty .Values.persistence.subPath) }}
-              subPath: {{ .Values.persistence.subPath }}
-{{- end }}
           {{- if .Values.livenessProbe.enabled }}
           livenessProbe:
             httpGet:
