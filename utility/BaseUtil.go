@@ -16,6 +16,10 @@ import (
 	"strings"
 )
 
+const (
+	UNKNOWN_IP_ADDR = "-"
+)
+
 // EncryptPassword 密码加密
 func EncryptPassword(password, salt string) string {
 	return gmd5.MustEncryptString(gmd5.MustEncryptString(password) + gmd5.MustEncryptString(salt))
@@ -42,6 +46,20 @@ func GetUserAgent(ctx context.Context) string {
 	return ghttp.RequestFromCtx(ctx).Header.Get("User-Agent")
 }
 
+// GetIpAddr 获取本地IP地址 利用udp
+func GetIpAddr() string {
+	conn, err := net.Dial("udp", "8.8.8.8:53")
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	// 192.168.1.20:61085
+	ip := strings.Split(localAddr.String(), ":")[0]
+
+	return ip
+}
+
 // GetLocalIP 服务端ip
 func GetLocalIP() (ip string, err error) {
 	var addrList []net.Addr
@@ -63,6 +81,29 @@ func GetLocalIP() (ip string, err error) {
 		return ipAddr.IP.String(), nil
 	}
 	return
+}
+
+func GetLocalIp() string {
+	inters, err := net.Interfaces()
+	if err != nil {
+		return UNKNOWN_IP_ADDR
+	}
+	for _, inter := range inters {
+		if inter.Flags&net.FlagLoopback != net.FlagLoopback &&
+			inter.Flags&net.FlagUp != 0 {
+			addrs, err := inter.Addrs()
+			if err != nil {
+				return UNKNOWN_IP_ADDR
+			}
+			for _, addr := range addrs {
+				if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+					return ipnet.IP.String()
+				}
+			}
+		}
+	}
+
+	return UNKNOWN_IP_ADDR
 }
 
 // GetCityByIp 获取ip所属城市

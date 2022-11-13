@@ -8,17 +8,14 @@ import (
 	"github.com/gogf/gf/v2/encoding/gjson"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/net/gclient"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gctx"
-	"github.com/gogf/gf/v2/os/gtimer"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/nacos-group/nacos-sdk-go/v2/clients"
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/config_client"
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/naming_client"
 	nacosModel "github.com/nacos-group/nacos-sdk-go/v2/model"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
-	"time"
 )
 
 const (
@@ -73,9 +70,7 @@ func RegisterInstance(ctx context.Context, s *ghttp.Server) (err error) {
 			ServerConfigs: nacosConfig.Server,
 		},
 	)
-	if err != nil {
-		return err
-	}
+	utils.ErrIsNil(ctx, err)
 	if nacosConfig.Discovery.Port == 0 {
 		nacosConfig.Discovery.Port = uint64(s.GetListenedPort())
 	}
@@ -83,48 +78,16 @@ func RegisterInstance(ctx context.Context, s *ghttp.Server) (err error) {
 		nacosConfig.Discovery.ServiceName = s.GetName()
 	}
 	if nacosConfig.Discovery.Ip == "" {
-		ip, err := utils.GetLocalIP()
-		if err != nil {
-			return err
-		}
+		ip := utils.GetIpAddr()
 		nacosConfig.Discovery.Ip = ip
 	}
 	success, err := namingClient.RegisterInstance(nacosConfig.Discovery)
-	if err != nil {
-		return
-	}
+	utils.ErrIsNil(ctx, err)
 	if !success {
 		return gerror.New("register instance failed!")
 	}
-	gtimer.SetInterval(ctx, 10*time.Second, func(ctx context.Context) {
-		actuator(ctx, namingClient)
-	})
+
 	return
-}
-
-func actuator(ctx context.Context, namingClient naming_client.INamingClient) {
-	services, err := GetService(g.Server().GetName())
-	utils.ErrIsNil(ctx, err)
-	ip, err := utils.GetLocalIP()
-	var port = uint64(0)
-	utils.ErrIsNil(ctx, err)
-	hosts := services.Hosts
-	for _, instance := range hosts {
-		utils.ErrIsNil(ctx, err)
-		if instance.Ip == ip {
-			port = instance.Port
-			break
-		}
-	}
-	if port != 0 {
-		r, err := g.Client().Get(ctx, fmt.Sprintf("http://%s:%d/actuator/health", ip, port))
-		utils.ErrIsNil(ctx, err)
-		defer func(r *gclient.Response) {
-			err = r.Close()
-			utils.ErrIsNil(ctx, err)
-		}(r)
-	}
-
 }
 
 func GetService(serviceName string) (services nacosModel.Service, err error) {

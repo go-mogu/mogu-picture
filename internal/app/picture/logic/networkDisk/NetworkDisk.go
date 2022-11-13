@@ -26,7 +26,6 @@ import (
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/text/gstr"
-	"github.com/gogf/gf/v2/util/guid"
 )
 
 func init() {
@@ -86,7 +85,6 @@ func (s *sNetworkDisk) GetFileList(ctx context.Context, networkDisk model.Networ
 
 // CreateFile 添加网盘文件表
 func (s *sNetworkDisk) CreateFile(ctx context.Context, in entity.NetworkDisk) (err error) {
-	in.Uid = guid.S()
 	if in.IsDir == 1 {
 		in.FileSize = 0
 	}

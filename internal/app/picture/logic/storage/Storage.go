@@ -16,8 +16,6 @@ import (
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/os/gtime"
-	"github.com/gogf/gf/v2/util/guid"
 )
 
 func init() {
@@ -118,12 +116,8 @@ func (s *sStorage) InitStorageSize(ctx context.Context, adminUid string, maxStor
 		return gerror.New(MessageConf.ENTITY_EXIST)
 	} else {
 		saveStorage := entity.Storage{
-			Uid:            guid.S(),
 			AdminUid:       adminUid,
 			StorageSize:    0,
-			Status:         1,
-			CreateTime:     gtime.Now(),
-			UpdateTime:     gtime.Now(),
 			MaxStorageSize: maxStorageSize,
 		}
 		_, err = dao.Storage.Ctx(ctx).Data(saveStorage).OmitEmpty().Insert()
@@ -194,19 +188,15 @@ func (s *sStorage) UploadFile(ctx context.Context, networkDisk model.NetworkDisk
 	networkDiskList := make([]entity.NetworkDisk, 0)
 	for _, file := range files {
 		saveNetworkDisk := entity.NetworkDisk{
-			Uid:         guid.S(),
 			AdminUid:    adminUid,
 			ExtendName:  file.PicExpandedName,
 			FileName:    file.PicName,
 			FilePath:    networkDisk.FilePath,
 			FileSize:    file.FileSize,
-			CreateTime:  gtime.Now(),
-			UpdateTime:  gtime.Now(),
 			LocalUrl:    file.PicUrl,
 			QiNiuUrl:    file.QiNiuUrl,
 			FileOldName: file.FileOldName,
 			MinioUrl:    file.MinioUrl,
-			Status:      EStatus.ENABLE,
 		}
 		networkDiskList = append(networkDiskList, saveNetworkDisk)
 	}

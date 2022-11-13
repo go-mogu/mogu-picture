@@ -8,6 +8,7 @@ require (
 	github.com/minio/minio-go/v7 v7.0.43
 	github.com/nacos-group/nacos-sdk-go/v2 v2.1.2
 	github.com/qiniu/go-sdk/v7 v7.13.0
+	github.com/yitter/idgenerator-go v1.3.2
 )
 
 require (

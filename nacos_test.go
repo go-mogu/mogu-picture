@@ -11,6 +11,8 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/model"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	"log"
+	"net"
+	"strings"
 	"testing"
 )
 
@@ -115,4 +117,23 @@ func TestClient(t *testing.T) {
 		panic(err)
 	}
 
+}
+
+func TestIp(t *testing.T) {
+	fmt.Println(utils.GetLocalIp())
+	fmt.Println(GetIpAddr())
+}
+
+// GetIpAddr 获取本地IP地址 利用udp
+func GetIpAddr() string {
+	conn, err := net.Dial("udp", "8.8.8.8:53")
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	// 192.168.1.20:61085
+	ip := strings.Split(localAddr.String(), ":")[0]
+
+	return ip
 }

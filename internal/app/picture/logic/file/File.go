@@ -25,7 +25,6 @@ import (
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/text/gstr"
-	"github.com/gogf/gf/v2/util/guid"
 )
 
 func init() {
@@ -190,10 +189,6 @@ func (s *sFile) UploadFile(param model.UploadFileParam) (result *model.File, err
 
 	result = param.File
 	result.FileSortUid = param.FileSort.Uid
-	result.Status = EStatus.ENABLE
-	result.CreateTime = gtime.Now()
-	result.UpdateTime = gtime.Now()
-	result.Uid = guid.S()
 	result.FileMd5 = md5
 	// 上传七牛云，判断是否能够上传七牛云
 	if EOpenStatus.OPEN == param.SystemConfig.UploadQiNiu {

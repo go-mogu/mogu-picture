@@ -20,7 +20,7 @@ nacos:
     group: test
     type: yaml
   discovery:
-    ip: 10.168.1.125
+#    ip: 10.168.1.125
     Weight: 1
     enable: true
     healthy: true
