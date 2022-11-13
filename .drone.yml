@@ -21,7 +21,7 @@ steps:
     commands:
       - go build -o mogu-picture main.go
   - name: publish
-    image: plugins/kaniko:1.6.6-kaniko1.8.1
+    image: registry.cn-guangzhou.aliyuncs.com/mogu-zh/drone-kaniko:latest
     settings:
       registry: registry.aliyuncs.com
       repo: mogu-zh/mogu-picture
