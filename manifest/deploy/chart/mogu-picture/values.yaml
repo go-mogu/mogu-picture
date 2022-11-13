@@ -6,7 +6,7 @@ image:
   private: true
   imagePullSecrets: ali-image-secret
   repository: registry.aliyuncs.com/mogu-zh/mogu-picture
-  tag: ~
+  tag: latest
   pullPolicy: Always
 
 ## Deployment 更新策略
