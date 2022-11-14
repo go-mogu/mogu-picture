@@ -9,7 +9,7 @@ import (
 
 // FileSortPageListReq 分页查询文件分类表Req
 type FileSortPageListReq struct {
-	g.Meta `path:"/pageList" tags:"FileSort" method:"post" summary:"分页查询文件分类表"`
+	g.Meta `path:"/pageList" tags:"FileSort" method:"post" summary:"分页查询文件分类表" dc:"分页查询文件分类表"`
 	model.FileSort
 }
 
@@ -21,7 +21,7 @@ type FileSortPageListRes struct {
 
 // FileSortListReq 列表查询文件分类表Req
 type FileSortListReq struct {
-	g.Meta `path:"/list" tags:"FileSort" method:"post" summary:"列表查询文件分类表"`
+	g.Meta `path:"/list" tags:"FileSort" method:"post" summary:"列表查询文件分类表" dc:"列表查询文件分类表"`
 	entity.FileSort
 }
 
@@ -32,7 +32,7 @@ type FileSortListRes struct {
 
 // FileSortGetReq 查询文件分类表详情Req
 type FileSortGetReq struct {
-	g.Meta `path:"/:id" tags:"FileSort" method:"get" summary:"列表查询文件分类表"`
+	g.Meta `path:"/:id" tags:"FileSort" method:"get" summary:"列表查询文件分类表" dc:"列表查询文件分类表"`
 	Uid    string `json:"uid" dc:"唯一uid"`
 }
 
@@ -43,7 +43,7 @@ type FileSortGetRes struct {
 
 // FileSortAddReq 添加文件分类表Req
 type FileSortAddReq struct {
-	g.Meta      `path:"/" tags:"FileSort" method:"post" summary:"添加文件分类表"`
+	g.Meta      `path:"/" tags:"FileSort" method:"post" summary:"添加文件分类表" dc:"添加文件分类表"`
 	Uid         string      `json:"uid"   dc:"唯一uid"`                            //唯一uid
 	ProjectName string      `json:"projectName" v:"required#项目名不能为空"  dc:"项目名"`  //项目名
 	SortName    string      `json:"sortName" v:"required#分类名不能为空"  dc:"分类名"`     //分类名
@@ -60,7 +60,7 @@ type FileSortAddRes struct {
 
 // FileSortEditReq 编辑文件分类表Req
 type FileSortEditReq struct {
-	g.Meta        `path:"/" tags:"FileSort" method:"put" summary:"编辑文件分类表"`
+	g.Meta        `path:"/" tags:"FileSort" method:"put" summary:"编辑文件分类表" dc:"编辑文件分类表"`
 	Uid           string      `json:"uid" v:"required#唯一uid不能为空"  dc:"唯一uid"`      //主键
 	VersionNumber string      `json:"versionNumber" v:"required#未识别到版本号" dc:"版本号"` //版本号
 	ProjectName   string      `json:"projectName" v:"required#项目名不能为空"  dc:"项目名"`  //项目名
@@ -78,14 +78,14 @@ type FileSortEditRes struct {
 
 // FileSortEditStateReq 编辑文件分类表状态Req
 type FileSortEditStateReq struct {
-	g.Meta `path:"/state" tags:"FileSort" method:"put" summary:"批量编辑文件分类表状态"`
+	g.Meta `path:"/state" tags:"FileSort" method:"put" summary:"批量编辑文件分类表状态" dc:"批量编辑文件分类表状态"`
 	Ids    []string `json:"ids" v:"required#字典主键不能为空"  dc:"id集合"`   //主键
 	State  int8     `json:"state" v:"required#字典状态不能为空"  dc:"字典状态"` //状态
 }
 
 // FileSortDelReq 删除文件分类表Req
 type FileSortDelReq struct {
-	g.Meta `path:"/" tags:"FileSort" method:"delete" summary:"删除文件分类表"`
+	g.Meta `path:"/" tags:"FileSort" method:"delete" summary:"删除文件分类表" dc:"删除文件分类表"`
 	Ids    []string `json:"ids" v:"required#请选择需要删除的数据" dc:"id集合"`
 }
 
